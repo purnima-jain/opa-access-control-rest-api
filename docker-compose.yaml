@@ -1,0 +1,16 @@
+version: '3.8' # Use a recent version
+services:
+  opa:
+    image: openpolicyagent/opa:latest-debug # Use a specific version in production
+    container_name: opa_container
+    command:
+      - "run"
+      - "--server"
+      - "--addr=0.0.0.0:8181" # Binds to all interfaces to be accessible outside the container
+      - "--log-format=json-pretty"
+    ports:
+      - "8181:8181"
+    restart: unless-stopped # Optional: ensures the container restarts automatically
+
+
+
