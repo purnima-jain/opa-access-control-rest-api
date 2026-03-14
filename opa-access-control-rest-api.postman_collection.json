@@ -1,0 +1,171 @@
+{
+  "info": {
+    "_postman_id": "afddc7f2-1223-4e1b-84aa-1256e4cf0ea1",
+    "name": "opa-access-control-rest-api",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "2696806"
+  },
+  "item": [
+    {
+      "name": "Inject Policy",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "package app.rbac\r\n\r\n# By default, deny requests.\r\ndefault allow := false\r\n\r\n# Allow admins to do anything.\r\nallow if user_is_admin\r\n\r\n# Allow the action if the user is granted permission to perform the action.\r\nallow if {\r\n\t# Find grants for the user.\r\n\tsome grant in user_is_granted\r\n\r\n\t# Check if the grant permits the action.\r\n\tinput.action == grant.action\r\n\tinput.type == grant.type\r\n}\r\n\r\n# user_is_admin is true if \"admin\" is among the user's roles as per data.user_roles\r\nuser_is_admin if \"admin\" in data.user_roles[input.user]\r\n\r\n# user_is_granted is a set of grants for the user identified in the request.\r\n# The `grant` will be contained if the set `user_is_granted` for every...\r\nuser_is_granted contains grant if {\r\n\t# `role` assigned an element of the user_roles for this user...\r\n\tsome role in data.user_roles[input.user]\r\n\r\n\t# `grant` assigned a single grant from the grants list for 'role'...\r\n\tsome grant in data.role_grants[role]\r\n}",
+          "options": {
+            "raw": {
+              "language": "text"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8181/v1/policies/example1",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8181",
+          "path": [
+            "v1",
+            "policies",
+            "example1"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Read Policies",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8181/v1/policies",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8181",
+          "path": [
+            "v1",
+            "policies"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Inject Data",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"user_roles\": {\r\n        \"alice\": [\r\n            \"admin\"\r\n        ],\r\n        \"bob\": [\r\n            \"employee\",\r\n            \"billing\"\r\n        ],\r\n        \"eve\": [\r\n            \"customer\"\r\n        ]\r\n    },\r\n    \"role_grants\": {\r\n        \"customer\": [\r\n            {\r\n                \"action\": \"read\",\r\n                \"type\": \"dog\"\r\n            },\r\n            {\r\n                \"action\": \"read\",\r\n                \"type\": \"cat\"\r\n            },\r\n            {\r\n                \"action\": \"adopt\",\r\n                \"type\": \"dog\"\r\n            },\r\n            {\r\n                \"action\": \"adopt\",\r\n                \"type\": \"cat\"\r\n            }\r\n        ],\r\n        \"employee\": [\r\n            {\r\n                \"action\": \"read\",\r\n                \"type\": \"dog\"\r\n            },\r\n            {\r\n                \"action\": \"read\",\r\n                \"type\": \"cat\"\r\n            },\r\n            {\r\n                \"action\": \"update\",\r\n                \"type\": \"dog\"\r\n            },\r\n            {\r\n                \"action\": \"update\",\r\n                \"type\": \"cat\"\r\n            }\r\n        ],\r\n        \"billing\": [\r\n            {\r\n                \"action\": \"read\",\r\n                \"type\": \"finance\"\r\n            },\r\n            {\r\n                \"action\": \"update\",\r\n                \"type\": \"finance\"\r\n            }\r\n        ]\r\n    }\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8181/v1/data",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8181",
+          "path": [
+            "v1",
+            "data"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Read Data",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8181/v1/data",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8181",
+          "path": [
+            "v1",
+            "data"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Query or Input",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"input\": {\r\n        \"user\": \"alice\",\r\n        \"action\": \"read\",\r\n        \"object\": \"id123\",\r\n        \"type\": \"dog\"\r\n    }\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8181/v1/data/app/rbac",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8181",
+          "path": [
+            "v1",
+            "data",
+            "app",
+            "rbac"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Data",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "[\r\n    \"non-admin\"\r\n]\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8181/v1/data/user_roles/alice",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8181",
+          "path": [
+            "v1",
+            "data",
+            "user_roles",
+            "alice"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
