@@ -42,6 +42,34 @@ And finally we ask:
 
 > *Is Alice allowed to **CREATE**?*
 
+A policy engine takes these three pieces, evaluates them together, and gives you the answer.
+
+<br/>
+
+If we map that into OPA terminology, it looks like this:
+- **Policy** → Anyone with role **Admin** is allowed to **CREATE**
+- **Data** → Alice has role **Admin**
+- **Input** → Is Alice allowed to **CREATE**?
+
+And that is really the first mental model to build before going deeper into OPA: **OPA itself does not hardcode your business decisions - it simply evaluates the rules you give it against the context you provide.**
+
+That separation is what makes it powerful.
+
+## 🧨 Enough theory - let's see OPA in action
+Theory is useful, but policy engines become much easier to understand once you actually see one running.
+
+For this demo, we will run Open Policy Agent inside a Docker container using a `docker-compose.yaml` setup, just to keep things simple and reproducible.
+
+The setup is intentionally lightweight - bring everything up with:
+```Bash
+docker-compose up
+```
+
+If everything is wired correctly, you should see version details printed back, which confirms that OPA is running properly inside the container.
+
+And now that our policy engine is sitting there quietly waiting for instructions, we can finally make it do something useful.
+
+For this demo, instead of inventing policies from scratch, we will borrow one of the well-known examples from the [Rego Playground](https://play.openpolicyagent.org/) - specifically the **Role-Based Access Control (RBAC)** example available in the official playground.
 
 
 
