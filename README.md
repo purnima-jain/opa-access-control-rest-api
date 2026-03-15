@@ -61,8 +61,15 @@ Theory is useful, but policy engines become much easier to understand once you a
 For this demo, we will run Open Policy Agent inside a Docker container using a `docker-compose.yaml` setup, just to keep things simple and reproducible.
 
 The setup is intentionally lightweight - bring everything up with:
-```Bash
+```bash
 docker-compose up
+```
+
+Once the container is up, it is always a good idea to verify that OPA is actually alive and healthy before doing anything else.
+
+You can jump into the container and check the installed version using:
+```bash
+docker exec -it opa_container opa version
 ```
 
 If everything is wired correctly, you should see version details printed back, which confirms that OPA is running properly inside the container.
@@ -70,6 +77,32 @@ If everything is wired correctly, you should see version details printed back, w
 And now that our policy engine is sitting there quietly waiting for instructions, we can finally make it do something useful.
 
 For this demo, instead of inventing policies from scratch, we will borrow one of the well-known examples from the [Rego Playground](https://play.openpolicyagent.org/) - specifically the **Role-Based Access Control (RBAC)** example available in the official playground.
+
+### Injecting our first policy into OPA
+Now that Open Policy Agent is up and running, the first real thing we need to do is give it a policy to evaluate.
+
+OPA does not magically know your rules - you have to explicitly load them into the engine.
+
+For this demo, we will take the policy available in the Rego Playground (RBAC example) policy panel and push it into OPA using its REST API.
+
+And yes, for quick experimentation, Postman makes this extremely convenient.
+
+We will send a `PUT` request to:
+
+```
+http://localhost:8181/v1/policies/example1
+```
+
+Using:
+- **HTTP Method** → `PUT`
+- **Body Type** → `raw`
+- **Format** → `Text`
+
+Then simply copy the policy content from the left-hand **Policy** panel of the Rego Playground and paste it into the request body.
+
+<img src="https://github.com/purnima-jain/opa-access-control-rest-api/blob/master/images/001_Inject_Policy.JPG" width=100% height=100% /> 
+
+
 
 
 
