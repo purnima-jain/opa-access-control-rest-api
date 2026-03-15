@@ -78,6 +78,8 @@ And now that our policy engine is sitting there quietly waiting for instructions
 
 For this demo, instead of inventing policies from scratch, we will borrow one of the well-known examples from the [Rego Playground](https://play.openpolicyagent.org/) - specifically the **Role-Based Access Control (RBAC)** example available in the official playground.
 
+<br/>
+
 ### Injecting our first policy into OPA
 Now that Open Policy Agent is up and running, the first real thing we need to do is give it a policy to evaluate.
 
@@ -100,9 +102,49 @@ Using:
 
 Then simply copy the policy content from the left-hand **Policy** panel of the Rego Playground and paste it into the request body.
 
-<img src="https://github.com/purnima-jain/opa-access-control-rest-api/blob/master/images/001_Inject_Policy.JPG" width=100% height=100% /> 
+<img src="https://github.com/purnima-jain/opa-access-control-rest-api/blob/master/images/001_Inject_Policy.JPG" width=100% height=100% />
 
+<br/>
 
+A small but important detail here: the name at the end of the URL - in this case `example1` - becomes the policy identifier inside OPA.
 
+So effectively, with this request, we are telling OPA:
 
+> *Here is a policy. Store it under the name `example1`.*
+
+Once the request succeeds, OPA compiles and stores that policy immediately, and it becomes available for evaluation.
+
+This is one of the nice things about OPA during development: you can inject, replace, and iterate on policies very quickly without restarting anything.
+
+<br/>
+
+### Reading back the policy (because trust, but verify)
+Once we push a policy into Open Policy Agent, it is always worth checking whether OPA actually accepted it the way we expected.
+
+A successful `PUT` response is reassuring, but I still prefer verifying what is sitting inside the engine before moving further.
+
+OPA gives us another REST endpoint for exactly that.
+
+Send a `GET` request to:
+
+```
+http://localhost:8181/v1/policies
+```
+
+Using:
+- **HTTP Method** → `GET`
+
+<img src="https://github.com/purnima-jain/opa-access-control-rest-api/blob/master/images/002_Read_Policies.JPG" width=100% height=100% />
+
+<br/>
+
+This returns the list of policies currently loaded into OPA.
+
+If everything worked correctly, you should see the policy we inserted earlier - `example1` - along with its stored source content.
+
+And now that the policy is safely inside OPA, the next obvious question is:
+
+> *A policy alone is just a rule. Where does OPA get the actual contextual information from?*
+
+That is where **data injection** comes in.
 
